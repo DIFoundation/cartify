@@ -1,9 +1,12 @@
 'use client';
-import Image from "next/image";
+import Image from 'next/image';
+import useCart from '../hooks/useCart';
 
 export default function ProductCard({ product }) {
+  const { addToCart } = useCart();
+
   const handleAddToCart = () => {
-    alert(`Added ${product.name} to cart`);
+    addToCart(product);
   };
 
   return (
