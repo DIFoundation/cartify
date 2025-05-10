@@ -4,7 +4,6 @@ import Link from 'next/link';
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState([]);
-  const [coupon, setCoupon] = useState('');
   const [discounted, setDiscounted] = useState(false);
   const [error, setError] = useState('');
 
@@ -80,16 +79,6 @@ export default function CartPage() {
               </div>
             </div>
           ))}
-
-          <div className="mt-6">
-            <button
-              onClick={handleApplyCoupon}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500"
-            >
-              Apply Coupon
-            </button>
-            {error && <p className="text-red-600 mt-2">{error}</p>}
-          </div>
 
           <h3 className="text-xl font-bold mt-4">
             Total: ${getTotal().toFixed(2)}

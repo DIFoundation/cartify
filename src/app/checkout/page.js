@@ -1,34 +1,32 @@
 "use client";
-
 import useCart from "@/hooks/useCart";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-
+import validateCheckoutForm from "@/lib/validateCheckoutForm";
+import validateCouponCode from "@/lib/validateCouponCode";
 
 export default function CheckoutPage() {
   const { cart } = useCart();
   const [form, setForm] = useState({ name: "", email: "", coupon: "" });
   const [discount, setDiscount] = useState(0);
 
-    const router = useRouter();
+  const router = useRouter();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleApplyCoupon = () => {
-    const code = form.coupon.trim();
-    const validCode = /^WEB3BRIDGECOHORTx$/;
-
-    if (validCode.test(code)) {
-      setDiscount(0.1); // 10%
-      toast.success("Coupon applied: 10% off");
-    } else {
-      setDiscount(0);
-      toast.error("Invalid coupon code");
-    }
-  };
+      const result = validateCouponCode(form.coupon);
+      if (result.valid) {
+        setDiscount(result.discount);
+        toast.success("Coupon applied: 10% off");
+      } else {
+        setDiscount(0);
+        toast.error("Invalid coupon code");
+      }
+    };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,15 +35,27 @@ export default function CheckoutPage() {
       return toast.error("Please fill in all required fields");
     }
 
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const total = subtotal - subtotal * discount;
+    const subtotal = cart.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    const total = subtotal - subtotal * discount;
+
+    const error = validateCheckoutForm(form);
+
+    if (error) {
+      return toast.error(error);
+    }
 
     toast.success("Order placed successfully!");
 
-  router.push(
-    `/success?name=${encodeURIComponent(form.name)}&email=${encodeURIComponent(form.email)}&total=${total}&products=${encodeURIComponent(JSON.stringify(cart))}`
-  );
-
+    router.push(
+      `/success?name=${encodeURIComponent(
+        form.name
+      )}&email=${encodeURIComponent(
+        form.email
+      )}&total=${total}&products=${encodeURIComponent(JSON.stringify(cart))}`
+    );
   };
 
   const subtotal = cart.reduce(
@@ -148,7 +158,7 @@ export default function CheckoutPage() {
           </form>
           <p className="text-sm text-gray-500 mt-2">
             By placing your order, you agree to our Terms and Conditions.
-            </p>
+          </p>
         </>
       )}
     </div>
