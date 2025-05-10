@@ -3,11 +3,15 @@
 import useCart from "@/hooks/useCart";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+
 
 export default function CheckoutPage() {
   const { cart } = useCart();
   const [form, setForm] = useState({ name: "", email: "", coupon: "" });
   const [discount, setDiscount] = useState(0);
+
+    const router = useRouter();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -33,8 +37,15 @@ export default function CheckoutPage() {
       return toast.error("Please fill in all required fields");
     }
 
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = subtotal - subtotal * discount;
+
     toast.success("Order placed successfully!");
-    // You could also clear localStorage/cart here
+
+  router.push(
+    `/success?name=${encodeURIComponent(form.name)}&email=${encodeURIComponent(form.email)}&total=${total}&products=${encodeURIComponent(JSON.stringify(cart))}`
+  );
+
   };
 
   const subtotal = cart.reduce(
