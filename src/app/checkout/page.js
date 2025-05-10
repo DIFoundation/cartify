@@ -18,15 +18,15 @@ export default function CheckoutPage() {
   };
 
   const handleApplyCoupon = () => {
-      const result = validateCouponCode(form.coupon);
-      if (result.valid) {
-        setDiscount(result.discount);
-        toast.success("Coupon applied: 10% off");
-      } else {
-        setDiscount(0);
-        toast.error("Invalid coupon code");
-      }
-    };
+    const result = validateCouponCode(form.coupon);
+    if (result.valid) {
+      setDiscount(result.discount);
+      toast.success("Coupon applied: 10% off");
+    } else {
+      setDiscount(0);
+      toast.error("Invalid coupon code");
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -47,15 +47,17 @@ export default function CheckoutPage() {
       return toast.error(error);
     }
 
-    toast.success("Order placed successfully!");
+    const orderData = {
+      name: form.name,
+      email: form.email,
+      total,
+      products: cart,
+    };
 
-    router.push(
-      `/success?name=${encodeURIComponent(
-        form.name
-      )}&email=${encodeURIComponent(
-        form.email
-      )}&total=${total}&products=${encodeURIComponent(JSON.stringify(cart))}`
-    );
+    localStorage.setItem("order-summary", JSON.stringify(orderData));
+
+    toast.success("Order placed successfully!");
+    router.push("/success");
   };
 
   const subtotal = cart.reduce(

@@ -1,32 +1,38 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from 'react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function SuccessPage() {
-  const searchParams = useSearchParams();
-  const name = searchParams.get("name");
-  const email = searchParams.get("email");
-  const total = searchParams.get("total");
-  const products = JSON.parse(searchParams.get("products") || "[]");
+  const [order, setOrder] = useState(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('order-summary');
+    if (saved) {
+      setOrder(JSON.parse(saved));
+      localStorage.removeItem('order-summary'); // Clear it after showing
+    }
+  }, []);
+
+  if (!order) {
+    return <p className="text-center p-6">No order data found.</p>;
+  }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
     <div className="max-w-3xl mx-auto p-6 text-center">
       <h1 className="text-3xl font-bold text-green-600 mb-4">
         🎉 Order Successful!
       </h1>
       <p className="text-lg mb-6">
-        Thank you <strong>{name}</strong> for your purchase.
+        Thank you <strong>{order.name}</strong> for your purchase.
       </p>
       <p className="mb-2">
-        A confirmation has been sent to: <strong>{email}</strong>
+        A confirmation has been sent to: <strong>{order.email}</strong>
       </p>
 
       <h2 className="text-xl font-semibold mt-8 mb-2">Order Summary</h2>
       <ul className="text-left">
-        {products.map((item, index) => (
+        {order.products.map((item, index) => (
           <li key={index} className="border-b py-2">
             {item.name} (x{item.quantity}) - ₦{item.price * item.quantity}
           </li>
@@ -34,7 +40,7 @@ export default function SuccessPage() {
       </ul>
 
       <p className="mt-4 text-xl font-bold">
-        Total Paid: ₦{Number(total).toFixed(2)}
+        Total Paid: ₦{Number(order.total).toFixed(2)}
       </p>
 
       <p className="mt-6 text-gray-600">We appreciate your business!</p>
@@ -45,6 +51,5 @@ export default function SuccessPage() {
         Back to Home
       </Link>
     </div>
-    </Suspense>
   );
 }
