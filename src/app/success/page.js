@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from 'react';
 
 export default function SuccessPage() {
   const searchParams = useSearchParams();
@@ -11,6 +12,7 @@ export default function SuccessPage() {
   const products = JSON.parse(searchParams.get("products") || "[]");
 
   return (
+    <Suspense fallback={<div>Loading...</div>}>
     <div className="max-w-3xl mx-auto p-6 text-center">
       <h1 className="text-3xl font-bold text-green-600 mb-4">
         🎉 Order Successful!
@@ -43,5 +45,6 @@ export default function SuccessPage() {
         Back to Home
       </Link>
     </div>
+    </Suspense>
   );
 }
